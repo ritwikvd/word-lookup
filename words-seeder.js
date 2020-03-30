@@ -75,17 +75,17 @@ async function startLoad(arr) {
 
     await Promise.all(results.map(({ data }) => {
         const { word } = data;
-        let { derivatives = [], entries, lexicalCategory: { text: lexicalCategory }, pronunciations } = data.results[0].lexicalEntries[0];
+        let { derivates, entries, lexicalCategory: { text: lexicalCategory }, pronunciations } = data.results[0].lexicalEntries[0];
         const { audioFile, phoneticSpelling } = pronunciations[0];
         let { etymologies, senses } = entries[0];
 
         senses = returnSenseSchema(senses);
 
-        derivatives = derivatives.map(item => item.text);
+        derivates = derivates.map(item => item.text);
 
         addAudioFile(word, audioFile);
 
-        return Word.create({ word, derivatives, etymologies, lexicalCategory, phoneticSpelling, audioFile, senses });
+        return Word.create({ word, derivates, etymologies, lexicalCategory, phoneticSpelling, audioFile, senses });
     }));
 
     console.log("All words added to MongoDB");
