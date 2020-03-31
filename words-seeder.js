@@ -19,25 +19,10 @@ process.on("unhandledRejection", error => {
 
 function importWords(err, data) {
     data = data.trim();
+
     const arr = data.split("\r\n");
 
-    const num = Math.ceil(arr.length / 50);
-    const final_arr = [];
-
-    if (num == 1) final_arr.push(arr);
-    else {
-        let length = arr.length;
-        let start = 0;
-
-        while (length > 0) {
-            const add_arr = arr.slice(start, length >= 50 ? 50 : length + start);
-            length -= 50;
-            start += 50;
-            final_arr.push(add_arr);
-        }
-    }
-
-    startLoad(final_arr);
+    startLoad(arr);
 };
 
 async function startLoad(arr) {
@@ -46,46 +31,55 @@ async function startLoad(arr) {
 
     let results = [];
 
+    const config = {
+        headers: {
+            app_id: "9d539987",
+            app_key: "44e5794c18ad95237d1c95c665a6685d"
+        }
+    };
+
     let iterator = arr[Symbol.iterator]();
 
-    for (let result = iterator.next(); !result.done;) {
+    let result = iterator.next();
 
-        const resolves = await Promise.all(result.value.map(async word => {
-            const config = {
-                headers: {
-                    app_id: "9d539987",
-                    app_key: "44e5794c18ad95237d1c95c665a6685d"
-                }
-            };
-        
-            console.log(word);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            return axios.get(`https://od-api.oxforddictionaries.com/api/v2/entries/en/${word}`, config);
-        }));
+    let stop;
 
-        results.push(...resolves);
+    do {
+        const resolved = await axios.get(`https://od-api.oxforddictionaries.com/api/v2/entries/en/${result.value}`, config);
 
-        result = iterator.next();
+        results.push(resolved);
 
-        console.log("finished 1 array");
+        console.log("pushed result of ", result.value, Date.now(), result.done);
 
         if(!result.done)
-        await new Promise(resolve => setTimeout(resolve, 70 * 1000));
-    }
+            await new Promise(resolve => setTimeout(resolve, 2 * 1000));
+        
+        let next = iterator.next();
+
+        stop = result.done;
+        
+        if (next) result = next;
+        
+    } while (!stop)
+    
+    console.log("url request done");
 
     await Promise.all(results.map(({ data }) => {
         const { word } = data;
-        let { derivates, entries, lexicalCategory: { text: lexicalCategory }, pronunciations } = data.results[0].lexicalEntries[0];
-        const { audioFile, phoneticSpelling } = pronunciations[0];
+        let { derivatives = [], entries, lexicalCategory: { text: lexicalCategory }, pronunciations } = data.results[0].lexicalEntries[0];
         let { etymologies, senses } = entries[0];
+
+        if (!pronunciations) pronunciations = entries[0].pronunciations; 
+        
+        const { audioFile, phoneticSpelling } = pronunciations[0];
 
         senses = returnSenseSchema(senses);
 
-        derivates = derivates.map(item => item.text);
+        derivatives = derivatives.map(item => item.text);
 
         addAudioFile(word, audioFile);
 
-        return Word.create({ word, derivates, etymologies, lexicalCategory, phoneticSpelling, audioFile, senses });
+        return Word.create({ word, derivatives, etymologies, lexicalCategory, phoneticSpelling, audioFile, senses });
     }));
 
     console.log("All words added to MongoDB");

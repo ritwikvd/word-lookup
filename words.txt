@@ -15,7 +15,6 @@ pageantry
 missive
 patrician
 suffuse
-flamberge ****
 emote
 largesse
 tremulous
@@ -73,7 +72,7 @@ didactic
 obeisance
 declaim
 expound
-appellation **
+appellation
 soliloquy
 aphorism
 pithy
