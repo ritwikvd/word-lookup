@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const error = require("./middleware/error");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
@@ -11,6 +12,7 @@ const router = require("./routes/words");
 
 app.use(cors());
 app.use("/api/v1", router);
+app.use(error);
 
 app.use(express.static("./audio-uploads"));
 

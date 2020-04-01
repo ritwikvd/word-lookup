@@ -1,20 +1,15 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import SearchContext from "./searchContext";
 import searchReducer from "./searchReducer";
 
 const SearchProvider = ({ children }) => {
 
     const initialState = {
-        searchedWord: null,
-        searchResults: {
-            word: null,
-            derivatives: null,
-            etymologies: null,
-            lexicalCategory: null,
-            phoneticSpelling: null,
-            senses: null
-        },
-        alerts: []
+        words: [],
+        prompts: [],
+        searchResults: {},
+        alert: "",
+        loading: true
     }
 
     const [state, dispatch] = useReducer(searchReducer, initialState);
@@ -22,22 +17,18 @@ const SearchProvider = ({ children }) => {
     const addAlert = alert => {
         dispatch({
             type: `ADD_ALERT`,
-            payload: {
-                alert
-            }
+            payload: alert
         });
     }
 
-    const searchWord = async searchedWord => {
-        const response = await fetch(`/api/v1/words/${searchedWord}`);
+    const searchWord = searchedWord => {
 
-        const result = await response.json();
+        const results = state.words.find(word => word.word.startsWith(searchedWord));
 
-        if (!result.success) return addAlert("Word not found");
-
-        const { derivatives, etymologies, lexicalCategory, phoneticSpelling, senses } = result.data[0];
+        const { word, derivatives, etymologies, lexicalCategory, phoneticSpelling, senses } = results;
 
         const searchResults = {
+            word,
             derivatives,
             etymologies,
             lexicalCategory,
@@ -47,16 +38,81 @@ const SearchProvider = ({ children }) => {
 
         dispatch({
             type: `SEARCH_WORD`,
-            payload: {
-                searchedWord,
-                searchResults
-            }
+            payload: searchResults
         });
     };
+
+    const addWord = async word => {
+
+        const resp = await fetch(`${process.env.REACT_APP_PROXY}/api/v1/words/${word}`, {
+            method: "POST"
+        });
+
+        const result = await resp.json();
+
+        const { success } = result;
+
+        addAlert(success ? "Word added successfully" : "No such word exists");
+    };
+
+    const clearSearch = () => {
+        dispatch({
+            type: `CLEAR_SEARCH`
+        })
+    };
+
+    const removeAndAlert = (alert, word) => {
+        dispatch({
+            type: `REMOVE_WORD`,
+            payload: {
+                word,
+                alert
+            }   
+        })
+    };
+
+    const deleteWord = async word => {
+        const response = await fetch(`${process.env.REACT_APP_PROXY}/api/v1/words/${word}`, {
+            method: "DELETE"
+        });
+
+        const { success } = await response.json();
+
+        removeAndAlert(success ? "Word deleted successfully" : "Could not delete word", word);
+    };
+
+    const promptWord = prompt => {
+        dispatch({
+            type: `ADD_PROMPTS`,
+            payload: prompt
+        });
+    };
+
+    useEffect(() => {
+
+        const callApi = async () => {
+            const response = await fetch(`${process.env.REACT_APP_PROXY}/api/v1/words`);
+
+            let { data } = await response.json();
+
+            dispatch({
+                type: `ADD_WORDS`,
+                payload: data
+            });
+        }
+
+        callApi();
+
+        return () => {}
+    }, [state.words]);
 
     return (
         <SearchContext.Provider value={{
             searchWord,
+            addWord,
+            clearSearch,
+            deleteWord,
+            promptWord,
             state
         }}>
             {children}

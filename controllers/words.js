@@ -60,7 +60,7 @@ exports.addWord = handler(addWord);
 const getWord = async (req, res, next) => {
     const data = await Word.find({ word: req.params.word });
 
-    if (!data.length) res.status(404).json({ success: false });
+    if (!data.length) return res.status(404).json({ success: false });
 
     res.status(200).json({ success: true, count: data.length, data });
 };
@@ -70,10 +70,14 @@ exports.getWord = handler(getWord);
 // @desc Delete a word
 // @route DEL /api/v1/words/:word
 // @access Public
-const deleteWord = async () => {
+const deleteWord = async (req, res, next) => {
     const word = req.params.word;
 
     const result = await Word.findOneAndDelete({ word });
+
+    const route = path.resolve(`./audio-uploads/${word}.mp3`);
+
+    fs.unlinkSync(route);
 
     res.status(200).json({ success: true, data: result });
 };

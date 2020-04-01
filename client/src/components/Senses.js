@@ -3,8 +3,6 @@ import Sense from "./Sense";
 
 const Senses = ({ senses }) => {
 
-    console.log("inside senses", senses);
-
     return (
         <div className="senses-container">
             <ol>

@@ -1,23 +1,22 @@
 import React, { useContext } from 'react';
 import SearchContext from "./context/searchContext";
-import Senses from "./Senses";
+import SingleSearchResult from "./SingleSearchResult";
 
 const SearchResults = () => {
 
-    const { state: { searchedWord, searchResults } } = useContext(SearchContext);
+    const { searchWord, state: { words, searchResults, prompts, loading } } = useContext(SearchContext);
 
-    const { derivatives, etymologies, lexicalCategory, phoneticSpelling, senses } = searchResults;
+    if (loading) return <p>Loading...</p>;
 
+    if (Object.keys(searchResults).length && !prompts.length) return <SingleSearchResult />
+
+    const displayWords = prompts.length ? prompts : words;
+    
     return (
         <div className="results-container">
-            {/* <audio src={`../../../audio-uploads/${searchedWord}.mp3`} controls /> */}
-            <h3>{searchedWord}</h3>
-            <p>{phoneticSpelling}</p>
-            <p>{lexicalCategory}</p>
-            <p>{derivatives}</p>
-            {senses ? <Senses {...{senses}} />: null}
-            <p>{etymologies}</p>
-
+            <ul className="results-list">
+                {displayWords.map(word => word.word).map(word => <li key = {word} onClick={() => searchWord(word)}>{word}</li>)}
+            </ul>
         </div>
     )
 };

@@ -1,0 +1,150 @@
+@import url("https://fonts.googleapis.com/css?family=Quicksand&display=swap");
+
+$primary-colour: rosybrown;
+
+@mixin flex($direction, $wrap, $align, $justify) {
+	display: flex;
+	flex-flow: $direction $wrap;
+	align-items: $align;
+	justify-content: $justify;
+}
+
+@mixin buttons() {
+    outline: none;
+    color: white;
+    background-color: goldenrod;
+    cursor: pointer;
+    padding: 5px;
+    font-size: larger;
+    border-radius: 20px;
+    border: none;
+}
+
+* {
+	box-sizing: border-box;
+    font-family: "Quicksand", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    @include flex(column, nowrap, center, center);
+}
+
+.container {
+    @include flex(column, nowrap, center, center);
+    height: calc(100vh - 10px);
+	width: calc(100vw - 10px);
+    
+    h1 {
+        color: goldenrod;
+    }
+}
+
+.results-container {
+    margin: 5px;
+    height: 60vh;
+    width: 90vw;
+    overflow: auto;
+
+    * {
+        margin: 5px;
+    }
+}
+
+.results-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-rows: repeat(auto-fit, 50px);
+
+    li {
+        text-align: center;
+        list-style: none;
+        background-color: goldenrod;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            transform: scale(0.9);
+        }
+    }
+}
+
+.search-box {
+    margin: 10px;
+    outline: none;
+    border-radius: 5px;
+    width: 70vw;
+    height: 5vh;
+    font-size: larger;
+    padding: 5px;
+    border: 1px solid goldenrod;
+    transition: all 0.2s;
+
+    &:focus {
+        border-radius: 20px;
+    }
+}
+
+.shake {
+	animation: shake 0.5s ease-in-out 1;
+
+	&::placeholder {
+		color: red;
+	}
+}
+
+
+@keyframes shake {
+	10% {
+		transform: translateX(-1px);
+	}
+
+	25% {
+		transform: translateX(3px);
+	}
+
+	50% {
+		transform: translateX(-3px);
+	}
+
+	75% {
+		transform: translateX(3px);
+	}
+}
+
+.alert-container {
+    color: goldenrod;
+    transition: all 0.2s;
+}
+
+.fade {
+    opacity: 0;
+}
+
+.btn-add-word, .btn-del-word, .btn-clear-search {
+    height: 5vh;
+    transition: all .1s;
+    @include buttons();
+
+    &:hover {
+        transform: scale(0.9);
+    }
+}
+
+.ml-20 {
+    margin-left: 20px;
+}
+
+audio {
+    outline: none;
+}
+
+.danger {
+    color: red;
+}
+
