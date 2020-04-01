@@ -9,6 +9,8 @@ const Search = () => {
     const [fade, setFadeAlert] = useState(false);
     const [missing, setMissing] = useState(false);
 
+    const inputRef = React.createRef();
+
     const updateValueAndPrompt = ({ target: { value } }) => {
         setValue(value);
         setMissing(false);
@@ -40,6 +42,10 @@ const Search = () => {
         title.textContent = "Word Lookup";
     }, []);
 
+    useEffect(() => {
+        !missing ? inputRef.current.focus() : inputRef.current.blur();
+    });
+
     return (
         <>
             <div className={fade? "alert-container fade": "alert-container"}>
@@ -51,7 +57,8 @@ const Search = () => {
 
                 <form action="#" className="search-form" onSubmit={searchForWord}>
                     
-                    <input type="text" value={value} onChange={updateValueAndPrompt}
+                    <input ref={inputRef} type="text" value={value} onChange={updateValueAndPrompt}
+                        onFocus={() => setMissing(false)}
                         className={missing ? "search-box shake" : "search-box"}
                         placeholder={missing? "?": "Search for a word"} />
                     {value && !prompts.length? <button className="btn-add-word" onClick={() => addWord(value)}>Add Word</button>: null}
