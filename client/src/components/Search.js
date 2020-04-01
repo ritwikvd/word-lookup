@@ -20,6 +20,8 @@ const Search = () => {
 
         if (!prompts.length && !value) return setMissing(true);
 
+        if (!prompts.length) return;
+
         searchWord(value);
         setValue("");
     };

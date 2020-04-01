@@ -5,10 +5,10 @@ router
     .route("/words")
     .get(getWords)
     
-    router
-        .route("/words/:word")
-        .get(getWord)
-        .post(addWord)
-        .delete(deleteWord);
+router
+    .route("/words/:word")
+    .get(getWord)
+    .post(addWord)
+    .delete(deleteWord);
 
 module.exports = router;

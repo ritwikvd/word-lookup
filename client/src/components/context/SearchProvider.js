@@ -44,7 +44,7 @@ const SearchProvider = ({ children }) => {
 
     const addWord = async word => {
 
-        const resp = await fetch(`${process.env.REACT_APP_PROXY}/api/v1/words/${word}`, {
+        const resp = await fetch(`${process.env.REACT_APP_PROXY}/api/v1/words/${word.replace(" ","_")}`, {
             method: "POST"
         });
 

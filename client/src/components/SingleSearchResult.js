@@ -19,7 +19,7 @@ const SingleSearchResult = () => {
 
             <audio autoPlay controls src={`${process.env.REACT_APP_PROXY}/${word.replace(" ","_")}.mp3`}/>       
 
-            <p>{phoneticSpelling}</p>
+            <p>{phoneticSpelling === "N/A"? null : phoneticSpelling}</p>
 
             <p>{lexicalCategory}</p>
 

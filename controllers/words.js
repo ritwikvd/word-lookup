@@ -38,6 +38,8 @@ const addWord = async (req, res, next) => {
 
     if (!pronunciations)  pronunciations  = entries[0].pronunciations; 
     
+    if (!pronunciations) pronunciations = [{}];
+    
     let { audioFile, phoneticSpelling } = pronunciations[0];
 
     senses = returnSenseSchema(senses);
@@ -77,7 +79,7 @@ const deleteWord = async (req, res, next) => {
 
     const route = path.resolve(`./audio-uploads/${word}.mp3`);
 
-    fs.unlinkSync(route);
+    fs.existsSync(route) && fs.unlinkSync(route);
 
     res.status(200).json({ success: true, data: result });
 };
@@ -86,7 +88,11 @@ exports.deleteWord = handler(deleteWord);
 
 //Utility functions
 async function addAudioFile(word, url) {
+
     //download audio file when adding a new word and store on server
+
+    if (!url) return;
+
     const route = path.resolve(`./audio-uploads/${word}.mp3`);
     const writer = fs.createWriteStream(route);
 
