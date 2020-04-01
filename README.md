@@ -1,2 +1,2 @@
 # word-lookup
-Personal collection of words
+Personal collection of new words encountered along with their definitions.
