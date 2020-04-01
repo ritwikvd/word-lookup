@@ -8,7 +8,7 @@ const SingleSearchResult = () => {
 
     const [confirmDelete, setConfirmDelete] = useState(false);
 
-    const { word, derivatives = [], etymologies, lexicalCategory, phoneticSpelling, senses } = searchResults
+    const { word, derivatives = [], etymologies, lexicalCategory, phoneticSpelling, senses } = searchResults;
 
     const confirmAndDelete = () => confirmDelete ? deleteWord(word) : setConfirmDelete(true);
 
@@ -17,7 +17,7 @@ const SingleSearchResult = () => {
 
             <h3>{word}</h3>
 
-            <audio controls autoPlay src={`${process.env.REACT_APP_PROXY}/${word.replace(" ","_")}.mp3`} type="audio/mpeg" />
+            <audio autoPlay controls src={`${process.env.REACT_APP_PROXY}/${word.replace(" ","_")}.mp3`}/>       
 
             <p>{phoneticSpelling}</p>
 

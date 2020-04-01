@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const error = require("./middleware/error");
+const path = require("path");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
@@ -15,6 +16,13 @@ app.use("/api/v1", router);
 app.use(error);
 
 app.use(express.static("./audio-uploads"));
+
+//Use React build
+app.use(express.static("./client/build"));
+
+app.get("*", (req, res) =>
+	res.sendFile(path.resolve("./client/build/index.html"))
+);
 
 const PORT = process.env.PORT || 8000;
 
