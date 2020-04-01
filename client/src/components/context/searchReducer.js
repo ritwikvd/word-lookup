@@ -28,7 +28,8 @@ export default (state, action) => {
 
             return {
                 ...state,
-                alert
+                alert,
+                loading: true
             };
         
         case `CLEAR_SEARCH`:
@@ -48,7 +49,8 @@ export default (state, action) => {
 
             return {
                 ...state,
-                alert: msg
+                alert: msg,
+                loading: true
             };
         
         case `ADD_PROMPTS`:
