@@ -33,6 +33,11 @@ const Search = () => {
         setValue("");
     }, [searchResults]);
 
+    useEffect(() => {
+        const title = document.querySelector("title");
+        title.textContent = "Word Lookup";
+    }, []);
+
     return (
         <>
             <div className={fade? "alert-container fade": "alert-container"}>
