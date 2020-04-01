@@ -6,7 +6,13 @@ const SearchResults = () => {
 
     const { searchWord, state: { words, searchResults, prompts, loading } } = useContext(SearchContext);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return (
+        <div>
+            <span className="dots"></span>
+            <span className="dots"></span>
+            <span className="dots"></span>
+        </div>
+    );
 
     if (Object.keys(searchResults).length && !prompts.length) return <SingleSearchResult />
 
