@@ -14,10 +14,7 @@ const returnSenseSchema = arr => {
 
         let { definitions, examples = [], subsenses = [], synonyms = [], domains = [], registers = [] } = obj;
 
-        examples = examples.map(item => item.text);
-        synonyms = synonyms.map(item => item.text);
-        domains = domains.map(item => item.text);
-        registers = registers.map(item => item.text);
+        [examples, synonyms, domains, registers] = [examples, synonyms, domains, registers].map(array => array.map(item => item.text));
 
         const Sense = mongoose.model("Sense", SenseSchema);
 

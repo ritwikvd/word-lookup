@@ -38,11 +38,6 @@ const Search = () => {
     }, [searchResults]);
 
     useEffect(() => {
-        const title = document.querySelector("title");
-        title.textContent = "Word Lookup";
-    }, []);
-
-    useEffect(() => {
         !missing ? inputRef.current.focus() : inputRef.current.blur();
     });
 

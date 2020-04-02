@@ -17,9 +17,9 @@ const SingleSearchResult = () => {
 
             <h3>{word}</h3>
 
-            <audio autoPlay controls src={`${process.env.REACT_APP_PROXY}/${word.replace(" ","_")}.mp3`}/>       
+            <audio autoPlay controls src={`${process.env.REACT_APP_PROXY}/${word.replace(" ", "_")}.mp3`} />
 
-            <p>{phoneticSpelling === "N/A"? null : phoneticSpelling}</p>
+            <p>{phoneticSpelling === "N/A" ? null : phoneticSpelling}</p>
 
             <p>{lexicalCategory}</p>
 
@@ -29,11 +29,11 @@ const SingleSearchResult = () => {
             
             <p>{etymologies.join(",").replace("N/A", "")}</p>
 
-            <button className={confirmDelete ? "btn-del-word danger" : "btn-del-word"} onClick={confirmAndDelete}>{confirmDelete? "Are you sure?": "Delete Word"}</button>
-            <button className="btn-clear-search" onClick = {clearSearch}>Back to all</button>
+            <button className={confirmDelete ? "btn-del-word danger" : "btn-del-word"} onClick={confirmAndDelete}>{confirmDelete ? "Are you sure?" : "Delete Word"}</button>
+            <button className="btn-clear-search" onClick={clearSearch}>Back to all</button>
 
         </div>
-    )
+    );
 }
 
 export default SingleSearchResult;

@@ -51,8 +51,7 @@ async function startLoad(arr) {
 
         console.log("pushed result of ", result.value, Date.now(), result.done);
 
-        if(!result.done)
-            await new Promise(resolve => setTimeout(resolve, 2 * 1000));
+        if(!result.done) await new Promise(resolve => setTimeout(resolve, 2 * 1000));
         
         let next = iterator.next();
 
@@ -70,6 +69,8 @@ async function startLoad(arr) {
         let { etymologies, senses } = entries[0];
 
         if (!pronunciations) pronunciations = entries[0].pronunciations; 
+
+        if (!pronunciations) pronunciations = [{}]; 
         
         const { audioFile, phoneticSpelling } = pronunciations[0];
 
@@ -89,6 +90,8 @@ async function startLoad(arr) {
 
 async function addAudioFile(word, url) {
     //download audio file when adding a new word and store on server
+    if (!url) return;
+
     const route = path.resolve(`./audio-uploads/${word}.mp3`);
     const writer = fs.createWriteStream(route);
 
