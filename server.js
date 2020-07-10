@@ -20,9 +20,8 @@ app.use(express.static("./audio-uploads"));
 //Use React build
 app.use(express.static("./client/build"));
 
-app.get("*", (req, res) =>
-	res.sendFile(path.resolve("./client/build/index.html"))
-);
+app.get("*", (req, res) => res.sendFile(path.resolve("./client/build/index.html")));
+//
 
 const PORT = process.env.PORT || 8000;
 
