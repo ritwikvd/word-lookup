@@ -33,8 +33,7 @@ async function startLoad(arr) {
 
     const config = {
         headers: {
-            app_id: "9d539987",
-            app_key: "44e5794c18ad95237d1c95c665a6685d"
+            *obfuscated*
         }
     };
 
