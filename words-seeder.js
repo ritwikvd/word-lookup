@@ -13,99 +13,103 @@ const { returnSenseSchema } = require("./models/Sense");
 fs.readFile(`./words.txt`, `utf8`, importWords);
 
 process.on("unhandledRejection", error => {
-    console.log(`Unhandled rejection: ${error}`);
-    process.exit(1);
+	console.log(`Unhandled rejection: ${error}`);
+	process.exit(1);
 });
 
 function importWords(err, data) {
-    data = data.trim();
+	data = data.trim();
 
-    const arr = data.split("\r\n");
+	const arr = data.split("\r\n");
 
-    startLoad(arr);
-};
+	startLoad(arr);
+}
 
 async function startLoad(arr) {
+	await mongo();
 
-    await mongo();
+	let results = [];
 
-    let results = [];
+	const config = {
+		headers: {
+			app_id: process.env.APP_ID,
+			app_key: process.env.APP_KEY
+		}
+	};
 
-    const config = {
-        headers: {
-            *obfuscated*
-        }
-    };
+	let iterator = arr[Symbol.iterator]();
 
-    let iterator = arr[Symbol.iterator]();
+	let result = iterator.next();
 
-    let result = iterator.next();
+	let stop;
 
-    let stop;
+	do {
+		const resolved = await axios.get(`https://od-api.oxforddictionaries.com/api/v2/entries/en/${result.value}`, config);
 
-    do {
-        const resolved = await axios.get(`https://od-api.oxforddictionaries.com/api/v2/entries/en/${result.value}`, config);
+		results.push(resolved);
 
-        results.push(resolved);
+		console.log("pushed result of ", result.value, Date.now(), result.done);
 
-        console.log("pushed result of ", result.value, Date.now(), result.done);
+		if (!result.done) await new Promise(resolve => setTimeout(resolve, 2 * 1000));
 
-        if(!result.done) await new Promise(resolve => setTimeout(resolve, 2 * 1000));
-        
-        let next = iterator.next();
+		let next = iterator.next();
 
-        stop = result.done;
-        
-        if (next) result = next;
-        
-    } while (!stop)
-    
-    console.log("url request done");
+		stop = result.done;
 
-    await Promise.all(results.map(({ data }) => {
-        const { word } = data;
-        let { derivatives = [], entries, lexicalCategory: { text: lexicalCategory }, pronunciations } = data.results[0].lexicalEntries[0];
-        let { etymologies, senses } = entries[0];
+		if (next) result = next;
+	} while (!stop);
 
-        if (!pronunciations) pronunciations = entries[0].pronunciations; 
+	console.log("url request done");
 
-        if (!pronunciations) pronunciations = [{}]; 
-        
-        const { audioFile, phoneticSpelling } = pronunciations[0];
+	await Promise.all(
+		results.map(({ data }) => {
+			const { word } = data;
+			let {
+				derivatives = [],
+				entries,
+				lexicalCategory: { text: lexicalCategory },
+				pronunciations
+			} = data.results[0].lexicalEntries[0];
+			let { etymologies, senses } = entries[0];
 
-        senses = returnSenseSchema(senses);
+			if (!pronunciations) pronunciations = entries[0].pronunciations;
 
-        derivatives = derivatives.map(item => item.text);
+			if (!pronunciations) pronunciations = [{}];
 
-        addAudioFile(word, audioFile);
+			const { audioFile, phoneticSpelling } = pronunciations[0];
 
-        return Word.create({ word, derivatives, etymologies, lexicalCategory, phoneticSpelling, audioFile, senses });
-    }));
+			senses = returnSenseSchema(senses);
 
-    console.log("All words added to MongoDB");
+			derivatives = derivatives.map(item => item.text);
 
-    process.exit(0);
+			addAudioFile(word, audioFile);
+
+			return Word.create({ word, derivatives, etymologies, lexicalCategory, phoneticSpelling, audioFile, senses });
+		})
+	);
+
+	console.log("All words added to MongoDB");
+
+	process.exit(0);
 }
 
 async function addAudioFile(word, url) {
-    //download audio file when adding a new word and store on server
-    if (!url) return;
+	//download audio file when adding a new word and store on server
+	if (!url) return;
 
-    const route = path.resolve(`./audio-uploads/${word}.mp3`);
-    const writer = fs.createWriteStream(route);
+	const route = path.resolve(`./audio-uploads/${word}.mp3`);
+	const writer = fs.createWriteStream(route);
 
-    const response = await axios({
-        url,
-        method: `GET`,
-        responseType: `stream`
-    });
+	const response = await axios({
+		url,
+		method: `GET`,
+		responseType: `stream`
+	});
 
-    response.data.pipe(writer);
+	response.data.pipe(writer);
 
-    await new Promise((resolve, reject) => {
-        writer.on(`finish`, resolve);
-        writer.on(`error`, reject);
-    });
+	await new Promise((resolve, reject) => {
+		writer.on(`finish`, resolve);
+		writer.on(`error`, reject);
+	});
 }
-
-
