@@ -13,7 +13,12 @@ const SingleSearchResult = () => {
 
 	const { word, derivatives = [], etymologies, lexicalCategory, phoneticSpelling, senses } = searchResults;
 
-	const confirmAndDelete = () => (confirmDelete ? deleteWord(word) : setConfirmDelete(true));
+	const confirmAndDelete = () =>
+		confirmDelete
+			? prompt("What's the magic word?", "Please?") == "shine!"
+				? deleteWord(word)
+				: alert("Nice try, but can't let you do that :)")
+			: setConfirmDelete(true);
 
 	return (
 		<div className="results-container">
@@ -31,7 +36,7 @@ const SingleSearchResult = () => {
 
 			<p>{etymologies.join(",").replace("N/A", "")}</p>
 
-			<button disabled className={confirmDelete ? "btn-del-word danger" : "btn-del-word"} onClick={confirmAndDelete}>
+			<button className={confirmDelete ? "btn-del-word danger" : "btn-del-word"} onClick={confirmAndDelete}>
 				{confirmDelete ? "Are you sure?" : "Delete Word"}
 			</button>
 			<button className="btn-clear-search" onClick={clearSearch}>
