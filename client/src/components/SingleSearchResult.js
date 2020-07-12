@@ -15,7 +15,7 @@ const SingleSearchResult = () => {
 
 	const confirmAndDelete = () =>
 		confirmDelete
-			? prompt("What's the magic word?", "Please?") == process.env.REACT_APP_DELETE_PASS
+			? prompt("What's the magic word?", "Please?") === process.env.REACT_APP_DELETE_PASS
 				? deleteWord(word)
 				: alert("Nice try, but can't let you do that :)")
 			: setConfirmDelete(true);
