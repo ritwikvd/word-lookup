@@ -7,7 +7,7 @@ const initialState = {
 	prompts: [],
 	searchResults: {},
 	alert: "",
-	loading: true,
+	loading: true
 };
 
 const SearchProvider = ({ children }) => {
@@ -16,7 +16,7 @@ const SearchProvider = ({ children }) => {
 	const addAlert = alert => {
 		dispatch({
 			type: `ADD_ALERT`,
-			payload: alert,
+			payload: alert
 		});
 	};
 
@@ -31,18 +31,18 @@ const SearchProvider = ({ children }) => {
 			etymologies,
 			lexicalCategory,
 			phoneticSpelling,
-			senses,
+			senses
 		};
 
 		dispatch({
 			type: `SEARCH_WORD`,
-			payload: searchResults,
+			payload: searchResults
 		});
 	};
 
 	const addWord = async word => {
 		const resp = await fetch(`${process.env.REACT_APP_PROXY}/api/v1/words/${word.replace(" ", "_")}`, {
-			method: "POST",
+			method: "POST"
 		});
 
 		const result = await resp.json();
@@ -54,7 +54,7 @@ const SearchProvider = ({ children }) => {
 
 	const clearSearch = () => {
 		dispatch({
-			type: `CLEAR_SEARCH`,
+			type: `CLEAR_SEARCH`
 		});
 	};
 
@@ -63,14 +63,14 @@ const SearchProvider = ({ children }) => {
 			type: `REMOVE_WORD`,
 			payload: {
 				word,
-				alert,
-			},
+				alert
+			}
 		});
 	};
 
 	const deleteWord = async word => {
 		const response = await fetch(`${process.env.REACT_APP_PROXY}/api/v1/words/${word}`, {
-			method: "DELETE",
+			method: "DELETE"
 		});
 
 		const { success } = await response.json();
@@ -81,7 +81,7 @@ const SearchProvider = ({ children }) => {
 	const promptWord = prompt => {
 		dispatch({
 			type: `ADD_PROMPTS`,
-			payload: prompt,
+			payload: prompt
 		});
 	};
 
@@ -91,14 +91,16 @@ const SearchProvider = ({ children }) => {
 
 			let { data } = await response.json();
 
+			console.log("This is the data ", data);
+
 			dispatch({
 				type: `ADD_WORDS`,
-				payload: data,
+				payload: data
 			});
 		};
 
 		callApi();
-	}, [state.words]);
+	}, [state.alert]);
 
 	return (
 		<SearchContext.Provider
@@ -108,7 +110,7 @@ const SearchProvider = ({ children }) => {
 				clearSearch,
 				deleteWord,
 				promptWord,
-				state,
+				state
 			}}>
 			{children}
 		</SearchContext.Provider>
