@@ -1,75 +1,76 @@
 //Reducer function
 export default (state, action) => {
-    switch (action.type) {
+	switch (action.type) {
+		case "LOADING":
+			return {
+				...state,
+				loading: true
+			};
+		case `ADD_WORDS`:
+			const { payload } = action;
 
-        case `ADD_WORDS`:
-            const { payload } = action;
+			return {
+				...state,
+				words: payload,
+				loading: false,
+				alert: ""
+			};
 
-            return {
-                ...state,
-                words: payload,
-                loading: false
-            };
+		case `SEARCH_WORD`:
+			const searchResults = action.payload;
 
-        case `SEARCH_WORD`:
+			return {
+				...state,
+				searchResults,
+				alerts: [],
+				prompts: []
+			};
 
-            const searchResults  = action.payload;
-            
-            return {
-                ...state,
-                searchResults,
-                alerts: [],
-                prompts: []
-            };
-        
-        case `ADD_ALERT`:
+		case `ADD_ALERT`:
+			const alert = action.payload;
 
-            const alert = action.payload;
+			return {
+				...state,
+				alert,
+				loading: true
+			};
 
-            return {
-                ...state,
-                alert,
-                loading: true
-            };
-        
-        case `CLEAR_SEARCH`:
+		case `CLEAR_SEARCH`:
+			return {
+				...state,
+				searchResults: {}
+			};
 
-            return {
-                ...state,
-                searchResults: {}
-            };
-        
-        case `REMOVE_WORD`:
+		case `REMOVE_WORD`:
+			const { word, alert: msg } = action.payload;
 
-            const { word, alert: msg } = action.payload;
+			// const index = state.words.findIndex(item => item.word === word);
 
-            const index = state.words.findIndex(item => item.word === word);
+			// state.words.splice(index, 1);
 
-            state.words.splice(index, 1);
+			return {
+				...state,
+				alert: msg,
+				loading: true
+			};
 
-            return {
-                ...state,
-                alert: msg,
-                loading: true
-            };
-        
-        case `ADD_PROMPTS`:
+		case `ADD_PROMPTS`:
+			const prompt = action.payload;
 
-            const prompt = action.payload;
+			if (!prompt)
+				return {
+					...state,
+					prompts: []
+				};
 
-            if (!prompt) return {
-                ...state,
-                prompts: []
-            };
+			const prompts = state.words.filter(item => item.word.startsWith(prompt));
 
-            const prompts = state.words.filter(item => item.word.startsWith(prompt));
+			return {
+				...state,
+				prompts
+			};
 
-            return {
-                ...state,
-                prompts
-            };
-    
-        default:
-            break;
-    }
+		default:
+			break;
+	}
 };

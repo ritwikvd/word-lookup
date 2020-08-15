@@ -7,7 +7,7 @@ dotenv.config({ path: "./config/config.env" });
 const mongo = require("./config/mongo");
 
 const Word = require("./models/Word");
-const { returnSenseSchema } = require("./models/Sense");
+const { addAudioFile, getWordObject } = require("./controllers/words");
 
 //Start
 fs.readFile(`./words.txt`, `utf8`, importWords);
@@ -29,6 +29,8 @@ async function startLoad(arr) {
 	await mongo();
 
 	let results = [];
+
+	if (!(process.env.APP_ID && process.env.APP_KEY)) throw new Error("config variables undefined ", process.env.APP_ID, process.env.APP_KEY);
 
 	const config = {
 		headers: {
@@ -64,52 +66,16 @@ async function startLoad(arr) {
 	await Promise.all(
 		results.map(({ data }) => {
 			const { word } = data;
-			let {
-				derivatives = [],
-				entries,
-				lexicalCategory: { text: lexicalCategory },
-				pronunciations
-			} = data.results[0].lexicalEntries[0];
-			let { etymologies, senses } = entries[0];
 
-			if (!pronunciations) pronunciations = entries[0].pronunciations;
+			const result = getWordObject(word, data.results[0].lexicalEntries);
 
-			if (!pronunciations) pronunciations = [{}];
+			addAudioFile(word, result.audioFile);
 
-			const { audioFile, phoneticSpelling } = pronunciations[0];
-
-			senses = returnSenseSchema(senses);
-
-			derivatives = derivatives.map(item => item.text);
-
-			addAudioFile(word, audioFile);
-
-			return Word.create({ word, derivatives, etymologies, lexicalCategory, phoneticSpelling, audioFile, senses });
+			return Word.create(result);
 		})
 	);
 
 	console.log("All words added to MongoDB");
 
 	process.exit(0);
-}
-
-async function addAudioFile(word, url) {
-	//download audio file when adding a new word and store on server
-	if (!url) return;
-
-	const route = path.resolve(`./audio-uploads/${word}.mp3`);
-	const writer = fs.createWriteStream(route);
-
-	const response = await axios({
-		url,
-		method: `GET`,
-		responseType: `stream`
-	});
-
-	response.data.pipe(writer);
-
-	await new Promise((resolve, reject) => {
-		writer.on(`finish`, resolve);
-		writer.on(`error`, reject);
-	});
 }

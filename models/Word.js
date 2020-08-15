@@ -6,6 +6,10 @@ const WordSchema = new mongoose.Schema({
 		type: String,
 		required: [true, "Please add a name"]
 	},
+	extras: {
+		type: [this],
+		default: []
+	},
 	derivatives: {
 		type: [String],
 		default: "N/A"

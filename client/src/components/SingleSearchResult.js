@@ -11,7 +11,7 @@ const SingleSearchResult = () => {
 
 	const [confirmDelete, setConfirmDelete] = useState(false);
 
-	const { word, derivatives = [], etymologies, lexicalCategory, phoneticSpelling, senses } = searchResults;
+	const { word, derivatives = [], etymologies, lexicalCategory, phoneticSpelling, senses, extras = [] } = searchResults;
 
 	const confirmAndDelete = () =>
 		confirmDelete
@@ -24,7 +24,7 @@ const SingleSearchResult = () => {
 		<div className="results-container">
 			<h3>{word}</h3>
 
-			<audio autoPlay controls src={`${process.env.REACT_APP_PROXY}/${word.replace(" ", "_")}.mp3`} />
+			<audio autoPlay controls src={`${process.env.REACT_APP_PROXY}/${word}.mp3`} />
 
 			<p>{phoneticSpelling === "N/A" ? null : phoneticSpelling}</p>
 
@@ -33,6 +33,20 @@ const SingleSearchResult = () => {
 			<p>{derivatives.join("; ")}</p>
 
 			{senses ? <Senses {...{ senses }} /> : null}
+
+			{extras.length
+				? extras.map(extra => (
+						<>
+							<p>{extra.phoneticSpelling === "N/A" ? null : extra.phoneticSpelling}</p>
+
+							<p>{extra.lexicalCategory}</p>
+
+							<p>{extra.derivatives.join("; ")}</p>
+
+							{extra.senses ? <Senses {...{ senses: extra.senses }} /> : null}
+						</>
+				  ))
+				: null}
 
 			<p>{etymologies.join(",").replace("N/A", "")}</p>
 

@@ -13,6 +13,19 @@ const initialState = {
 const SearchProvider = ({ children }) => {
 	const [state, dispatch] = useReducer(searchReducer, initialState);
 
+	const callApi = async () => {
+		const response = await fetch(`${process.env.REACT_APP_PROXY}/api/v1/words`);
+
+		let { data } = await response.json();
+
+		console.log("This is the data ", data);
+
+		dispatch({
+			type: `ADD_WORDS`,
+			payload: data
+		});
+	};
+
 	const addAlert = alert => {
 		dispatch({
 			type: `ADD_ALERT`,
@@ -23,10 +36,11 @@ const SearchProvider = ({ children }) => {
 	const searchWord = searchedWord => {
 		const results = state.words.find(word => word.word.startsWith(searchedWord));
 
-		const { word, derivatives, etymologies, lexicalCategory, phoneticSpelling, senses } = results;
+		const { word, extras, derivatives, etymologies, lexicalCategory, phoneticSpelling, senses } = results;
 
 		const searchResults = {
 			word,
+			extras,
 			derivatives,
 			etymologies,
 			lexicalCategory,
@@ -41,6 +55,10 @@ const SearchProvider = ({ children }) => {
 	};
 
 	const addWord = async word => {
+		dispatch({
+			type: "LOADING"
+		});
+
 		const resp = await fetch(`${process.env.REACT_APP_PROXY}/api/v1/words/${word.replace(" ", "_")}`, {
 			method: "POST"
 		});
@@ -49,7 +67,11 @@ const SearchProvider = ({ children }) => {
 
 		const { success } = result;
 
+		console.log("success", success);
+
 		addAlert(success ? "Word added successfully" : "No such word exists");
+
+		setTimeout(callApi, 2000);
 	};
 
 	const clearSearch = () => {
@@ -76,6 +98,8 @@ const SearchProvider = ({ children }) => {
 		const { success } = await response.json();
 
 		removeAndAlert(success ? "Word deleted successfully" : "Could not delete word", word);
+
+		setTimeout(callApi, 2000);
 	};
 
 	const promptWord = prompt => {
@@ -86,21 +110,8 @@ const SearchProvider = ({ children }) => {
 	};
 
 	useEffect(() => {
-		const callApi = async () => {
-			const response = await fetch(`${process.env.REACT_APP_PROXY}/api/v1/words`);
-
-			let { data } = await response.json();
-
-			console.log("This is the data ", data);
-
-			dispatch({
-				type: `ADD_WORDS`,
-				payload: data
-			});
-		};
-
 		callApi();
-	}, [state.alert]);
+	}, []);
 
 	return (
 		<SearchContext.Provider

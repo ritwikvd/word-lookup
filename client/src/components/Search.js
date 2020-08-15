@@ -2,15 +2,11 @@ import React, { useContext, useState, useEffect } from "react";
 import SearchContext from "./context/searchContext";
 
 const Search = () => {
-	const {
-		searchWord,
-		promptWord,
-		addWord,
-		state: { alert, prompts, searchResults },
-	} = useContext(SearchContext);
+	const { searchWord, promptWord, addWord, state } = useContext(SearchContext);
+
+	const { alert, prompts, searchResults } = state;
 
 	const [value, setValue] = useState("");
-	const [fade, setFadeAlert] = useState(false);
 	const [missing, setMissing] = useState(false);
 
 	const inputRef = React.createRef();
@@ -33,11 +29,6 @@ const Search = () => {
 	};
 
 	useEffect(() => {
-		setFadeAlert(false);
-		alert && setTimeout(() => setFadeAlert(true), 5000);
-	}, [alert]);
-
-	useEffect(() => {
 		setValue("");
 	}, [searchResults]);
 
@@ -47,7 +38,7 @@ const Search = () => {
 
 	return (
 		<>
-			<div className={fade ? "alert-container fade" : "alert-container"}>{alert}</div>
+			<div className={"alert-container"}>{alert}</div>
 
 			<div className="search-container">
 				<form action="#" className="search-form" onSubmit={searchForWord}>
